@@ -1,10 +1,14 @@
-from fastapi import FastAPI
-from api.analitic.router import analitics_router
-from api.courses.router import course_router
-from api.users.router import users_router
+from database.postgres import postgresManager
+from database.redis import redisManager
+from routers.cards.routers import cards_router
+from routers.collections.routers import collection_router
+from routers.users.routers import users_router
+
 import logging
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from database import db_core, redis_client
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -21,10 +25,10 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    await db_core.init_db()    
-    await redis_client.connect()
+    await postgresManager.init_db()    
+    await redisManager.connect()
 # Подключение маршрутов
 
-app.include_router(analitics_router)
-app.include_router(course_router)
+app.include_router(cards_router)
+app.include_router(collection_router)
 app.include_router(users_router)

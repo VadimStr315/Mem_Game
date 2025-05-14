@@ -41,7 +41,7 @@ services:
       - redis
     networks:
       - core_network
-    command: ["sh", "-c", "sleep 10 && uvicorn api.app:app --host 0.0.0.0 --port 8000 --reload"]
+    command: ["sh", "-c", "sleep 10 && uvicorn app:app --host 0.0.0.0 --port 8000 --reload"]
 
 
   pgadmin:

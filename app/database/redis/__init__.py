@@ -1,3 +1,3 @@
-from app.database.redis import redisCore
+from database.redis.redisCore import RedisClient
 
-redisManager = redisCore()
+redisManager = RedisClient()

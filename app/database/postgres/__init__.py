@@ -1,4 +1,4 @@
-from app.database.postgres.postgres_core import PosgtresCore, CardsManager, CollectionManager
+from database.postgres.postgres_core import PosgtresCore, CardsManager, CollectionManager
 
 postgresManager = PosgtresCore()
 

@@ -1,6 +1,6 @@
 import logging
 
-from app.database.postgres.models import Base, Users, Collections, Cards
+from database.postgres.models import Base, Users, Collections, Cards
 from sqlalchemy import select, func, delete
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from decouple import config
@@ -132,19 +132,16 @@ class CollectionManager(PosgtresCore):
         
     async def update_collection(self, collection):
         async with self.Session() as session:
-            # Fetch the existing collection from the database
             existing_collection = await session.get(Collections, collection.id)
             
             if existing_collection is None:
                 raise ValueError("Collection not found")
-            # Update fields if they are provided
             if collection.name is not None:
                 existing_collection.name = collection.name
             
             if collection.amount_of_cards is not None:
                 existing_collection.amount_of_cards = collection.amount_of_cards
             
-            # Commit the changes to the database
             await session.commit()
 
             return existing_collection
