@@ -6,7 +6,9 @@ from database.redis import redisManager
 from database.postgres import collectionManager, cardsManager, postgresManager
 
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
+
 from fastapi.security import OAuth2PasswordRequestForm
 import logging
 
@@ -33,7 +35,10 @@ async def update_card(card:UpdateCard):
 async def delete_card(card_id:int):
     try:
         del_card = await cardsManager.delete_card(card_id=card_id)
-        return Response(status_code=200, detail = 'Card deleted sucess')
+        if del_card:
+            return JSONResponse(status_code=200, content = 'Card deleted sucess')
+        else:
+            return JSONResponse(status_code=404, content = 'Card not found')
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     

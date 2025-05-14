@@ -43,7 +43,7 @@ class Collections(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    name:  Mapped[str] = mapped_column(String(255))
+    name:  Mapped[str] = mapped_column(String(255),unique=True)
     amount_of_cards:  Mapped[int] = mapped_column(Integer)
 
 
@@ -59,7 +59,7 @@ class Cards(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    text:  Mapped[str] = mapped_column(String)
+    text:  Mapped[str] = mapped_column(String, unique=True)
     collection_id: Mapped[int] = mapped_column(
         ForeignKey('collections.id', ondelete='CASCADE'))
     collection: Mapped[Collections] = relationship(

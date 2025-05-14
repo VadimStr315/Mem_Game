@@ -81,7 +81,7 @@ class PosgtresCore:
 
 class CollectionManager(PosgtresCore):
 
-    async def create_collection(self, collection: Collections):
+    async def create_collection(self, collection):
         async with self.Session() as session:
             new_collection = Collections(
                 name = collection.name,
@@ -93,15 +93,13 @@ class CollectionManager(PosgtresCore):
 
             return new_collection
     
-    async def get_collection(self, id:int=None):
-        if id == None:
+    async def get_collection(self, collection_id:int=None):
+        if collection_id == None:
             return []
         
         async with self.Session() as session:
-            result = await session.execute(
-                select(Collections).where(Collections.id == id)
-            )
-            result = result.scalar_one_or_none()
+            result = await session.get(Collections, collection_id)
+            # result = result.scalar_one_or_none()
             return result
         
     async def get_collections(self):
@@ -110,22 +108,22 @@ class CollectionManager(PosgtresCore):
             result = await session.execute(
                 select(Collections)
             )
-            results = result.all()
-            return results
+            collections = result.scalars().all()
+            return collections
         
-    async def delete_collection(self, id:int=None):
-        if id == None:
+    async def delete_collection(self, collection_id:int=None):
+        if collection_id == None:
             return []
         
         async with self.Session() as session:
-            existing = await session.get(Collections, id)
+            existing = await session.get(Collections, collection_id)
             if not existing:
                 return False
                 
             # Perform the deletion
             result = await session.execute(
                 delete(Collections)
-                .where(Collections.id == id)
+                .where(Collections.id == collection_id)
             )
             await session.commit()
             return True
@@ -143,7 +141,7 @@ class CollectionManager(PosgtresCore):
                 existing_collection.amount_of_cards = collection.amount_of_cards
             
             await session.commit()
-
+            await session.refresh(existing_collection)
             return existing_collection
 
 
@@ -180,7 +178,7 @@ class CardsManager(PosgtresCore):
                 exisiting_card.collection_id = card.collection_id
             
             await session.commit()
-
+            await session.refresh(exisiting_card)
             return exisiting_card
         
     async def delete_card(self, card_id):

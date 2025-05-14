@@ -8,7 +8,9 @@ from database.redis import redisManager
 from database.postgres import collectionManager, cardsManager, postgresManager
 
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
+
 from fastapi.security import OAuth2PasswordRequestForm
 import logging
 
