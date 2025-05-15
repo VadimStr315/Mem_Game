@@ -48,7 +48,7 @@ class Collections(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
     name:  Mapped[str] = mapped_column(String(255),unique=True)
-    amount_of_cards:  Mapped[int] = mapped_column(Integer)
+    # amount_of_cards:  Mapped[int] = mapped_column(Integer)
 
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     

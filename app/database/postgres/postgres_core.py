@@ -56,14 +56,27 @@ class PosgtresCore:
             result = await session.execute(select(User).filter_by(email=email))
             user = result.scalars().first()
             return user
-        
+    
+    async def create_default_collection(self, user_id:int = None):
+        async with self.Session() as session:
+            new_collection = Collections(
+                name = 'Все карточки',
+                # amount_of_cards = 0,
+                user_id=user_id   
+            )
+            session.add(new_collection)
+            await session.commit()
+
+            return new_collection
+
     async def init_admin_user(self):
         email = config('ADMIN_EMAIL')
         if not await self.check_user_exists(email=email):
             password = config('ADMIN_PASSWORD')
             pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
             hashed_password = pwd_context.hash(password)
-            await self.create_user(email, hashed_password)
+            user = await self.create_user(email, hashed_password)
+            await self.create_default_collection(user_id=user.id)
 
     async def init_db(self):
         """Initialize the database and create tables."""
@@ -82,11 +95,19 @@ class PosgtresCore:
 
 class CollectionManager(PosgtresCore):
 
+    async def count_amount(self, collection_id):
+        async with self.Session() as session:  # Предполагается, что self.Session() - это асинхронная сессия
+            # Формируем запрос для подсчета количества карт в коллекции с заданным collection_id
+            stmt = select(Cards).where(Cards.collection_id == collection_id)
+            result = await session.execute(stmt)
+            count = result.scalars().count()  # Получаем количество записей
+            return int(count)
+
     async def create_collection(self, collection, user_id):
         async with self.Session() as session:
             new_collection = Collections(
                 name = collection.name,
-                amount_of_cards = 0,
+                # amount_of_cards = 0,
                 user_id=user_id   
             )
             session.add(new_collection)
@@ -107,7 +128,10 @@ class CollectionManager(PosgtresCore):
                     Collections.user_id == user_id
                 )
             )
-            return result.scalar_one_or_none()
+            collection = result.scalar_one_or_none()
+            if collection is not None:
+                collection.amount_of_cards = await self.count_amount(collection_id=collection_id)
+            return collection
         
     async def get_collections_with_cards(self, user_id: int, limit_cards: int = 5):
         async with self.Session() as session:
@@ -140,10 +164,11 @@ class CollectionManager(PosgtresCore):
             collections_map = {}
             for collection, card in result:
                 if collection.id not in collections_map:
+                    amount_of_cards = await self.count_amount(collection.id)
                     collections_map[collection.id] = {
                         "id": collection.id,
                         "name": collection.name,
-                        "amount_of_cards": collection.amount_of_cards,
+                        "amount_of_cards": amount_of_cards,
                         "cards": []
                     }
                 collections_map[collection.id]["cards"].append(card)
@@ -185,26 +210,25 @@ class CollectionManager(PosgtresCore):
             if collection.name is not None:
                 existing_collection.name = collection.name
             
-            if collection.amount_of_cards is not None:
-                existing_collection.amount_of_cards = collection.amount_of_cards
+            # if collection.amount_of_cards is not None:
+            #     existing_collection.amount_of_cards = collection.amount_of_cards
             
             await session.commit()
             await session.refresh(existing_collection)
+            existing_collection.amount_of_cards = await self.count_amount(collection_id=collection.id)
             return existing_collection
 
 
-class CardsManager(PosgtresCore):
+class CardsManager(CollectionManager):
     async def create_card(self, card:Cards):
         async with self.Session() as session:
             new_card = Cards(
                 text = card.text,
                 collection_id = card.collection_id,
             )
-
             session.add(new_card)
             await session.commit()
             await session.refresh(new_card)
-
             return new_card
         
     async def get_card(self,card_id):
