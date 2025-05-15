@@ -9,6 +9,8 @@ from sqlalchemy.exc import IntegrityError
 from typing import Optional
 
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class PosgtresCore:
@@ -40,16 +42,24 @@ class PosgtresCore:
             user_exists = exists.scalars().first() is not None
             return user_exists
 
+
     async def create_user(self, email: str, hashed_password: str):
         async with self.Session() as session:
             user = User(email=email, hashed_password=hashed_password)
             session.add(user)
             try:
                 await session.commit()
-            except IntegrityError:
+                await session.refresh(user)  # Обновляем объект user, чтобы получить id
+                logger.info(f"Пользователь создан: {user.email} с ID: {user.id}")
+                return user  # Возвращаем объект user с id
+            except IntegrityError as e:
                 await session.rollback()
+                logger.error(f"Ошибка при создании пользователя: {e.orig}")  # Логируем оригинальную ошибку
                 return None
-            return user
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Неизвестная ошибка при создании пользователя: {e}")
+                return None
 
     async def get_user(self, email: str):
         async with self.Session() as session:
@@ -75,7 +85,13 @@ class PosgtresCore:
             password = config('ADMIN_PASSWORD')
             pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
             hashed_password = pwd_context.hash(password)
+
             user = await self.create_user(email, hashed_password)
+            
+            if user is None:
+                raise Exception("Не удалось создать администратора.")
+            
+            # Создаем коллекцию по умолчанию
             await self.create_default_collection(user_id=user.id)
 
     async def init_db(self):
