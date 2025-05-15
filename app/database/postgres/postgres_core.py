@@ -286,3 +286,18 @@ class CardsManager(PosgtresCore):
             random_card = result.scalars().first()
 
             return random_card
+
+    async def get_all_cards(self, user_id:int = None):
+        if user_id is None:
+            return []
+        
+        async with self.Session() as session:
+            stmt = (
+                    select(Cards)
+                    .join(Collections, Cards.collection_id == Collections.id)
+                    .where(Collections.user_id == user_id)
+                )
+            query = await session.execute(stmt)
+
+            result = query.all()
+            return result
