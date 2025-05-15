@@ -50,3 +50,13 @@ async def get_card(card_id:int, current_user: User = Depends(get_current_user)):
         return GetCardOneCard.model_validate(card)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@cards_router.get('/random_card', response_model=GetCardOneCard)
+async def get_random_card(current_user: User = Depends(get_current_user)):
+    try:
+        user_id = current_user.id
+        card = await cardsManager.random_card(user_id=user_id)
+
+        return GetCardOneCard.model_validate(card)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
