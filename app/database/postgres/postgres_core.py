@@ -109,15 +109,46 @@ class CollectionManager(PosgtresCore):
             )
             return result.scalar_one_or_none()
         
-    async def get_collections(self,user_id):
-    
+    async def get_collections_with_cards(self, user_id: int, limit_cards: int = 5):
         async with self.Session() as session:
-            result = await session.execute(
-                select(Collections)
-                .where(Collections.user_id == user_id)
+            # Создаем подзапрос для карточек с нумерацией внутри коллекции
+            numbered_cards = (
+                select(
+                    Cards,
+                    func.row_number().over(
+                        partition_by=Cards.collection_id,
+                        order_by=Cards.id
+                    ).label('row_num')
+                )
+                .subquery()
             )
-            collections = result.scalars().all()
-            return collections
+
+            # Основной запрос с фильтрацией по номеру строки
+            stmt = (
+                select(Collections, Cards)
+                .join(numbered_cards, Collections.id == numbered_cards.c.collection_id)
+                .where(
+                    (Collections.user_id == user_id) &
+                    (numbered_cards.c.row_num <= limit_cards)
+                )
+                .order_by(Collections.id, numbered_cards.c.row_num)
+            )
+
+            result = await session.execute(stmt)
+            
+            # Группируем результаты по коллекциям
+            collections_map = {}
+            for collection, card in result:
+                if collection.id not in collections_map:
+                    collections_map[collection.id] = {
+                        "id": collection.id,
+                        "name": collection.name,
+                        "amount_of_cards": collection.amount_of_cards,
+                        "cards": []
+                    }
+                collections_map[collection.id]["cards"].append(card)
+            
+            return list(collections_map.values())
         
     async def delete_collection(self, collection_id:int=None, user_id:int=None):
         if collection_id == None:

@@ -3,7 +3,8 @@
 from routers.collections.models import (CreateCollection,
                                         GetCollection,
                                         GetListOfCards,
-                                        UpdateCollection)
+                                        UpdateCollection,
+                                        CollectionWithCardsResponse)
 from routers.users.models import User
 from routers.users.auth import get_current_user
 from database.postgres import collectionManager, cardsManager
@@ -33,7 +34,8 @@ async def create_collection(collection:CreateCollection, current_user: User = De
 @collection_router.patch('/update_collection',response_model=UpdateCollection)
 async def update_collection(collection:UpdateCollection, current_user: User = Depends(get_current_user)):
     try:
-        new_collection = await collectionManager.update_collection(collection=collection)
+        user_id = current_user.id
+        new_collection = await collectionManager.update_collection(collection=collection,user_id=user_id)
         return UpdateCollection.model_validate(new_collection)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -41,17 +43,18 @@ async def update_collection(collection:UpdateCollection, current_user: User = De
 @collection_router.delete('/{collection_id}')
 async def delete_collection(collection_id:int, current_user: User = Depends(get_current_user)):
     try:
-        collection = await collectionManager.delete_collection(collection_id=collection_id)
+        user_id = current_user.id
+        collection = await collectionManager.delete_collection(collection_id=collection_id,user_id=user_id)
         return JSONResponse(status_code=200, content={'message':'collection delete success'})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-@collection_router.get('/all', response_model=List[GetCollection])
-async def get_all_collections(current_user: User = Depends(get_current_user)):
+@collection_router.get('/all', response_model=List[CollectionWithCardsResponse])
+async def get_all_collections_with_cards(current_user: User = Depends(get_current_user)):
     try:
-        collections = await collectionManager.get_collections()
-        collection_lists = [GetCollection.model_validate(collection) for collection in collections]
-        return collection_lists
+        user_id = current_user.id
+        collections = await collectionManager.get_collections_with_cards(user_id=user_id)
+        return collections
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -68,7 +71,8 @@ async def get_collection_cards(collection_id:int, current_user: User = Depends(g
 @collection_router.get('/{collection_id}',response_model=GetCollection)
 async def get_collection(collection_id:int, current_user: User = Depends(get_current_user)):
     try:
-        new_collection = await collectionManager.get_user_collection(collection_id=collection_id)
+        user_id = current_user.id
+        new_collection = await collectionManager.get_user_collection(collection_id=collection_id, user_id=user_id)
         return GetCollection.model_validate(new_collection)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
