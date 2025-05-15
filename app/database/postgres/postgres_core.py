@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from decouple import config
 from passlib.context import CryptContext
 from sqlalchemy.exc import IntegrityError
+from typing import Optional
 
 
 
@@ -225,18 +226,30 @@ class CardsManager(PosgtresCore):
             result = result.all()
             return result
         
-    async def random_card(self, user_id:int = None):
+    async def random_card(self, user_id:int = None, collection_id = None):
         if user_id is None:
             return {}
         
         async with self.Session() as session:
-            stmt = (
-                select(Cards)
-                .join(Collections, Cards.collection_id == Collections.id)
-                .where(Collections.user_id == user_id)
-                .order_by(func.random())
-                .limit(1)
-            )
+            if collection_id is None:
+                stmt = (
+                    select(Cards)
+                    .join(Collections, Cards.collection_id == Collections.id)
+                    .where(
+                        (Cards.collection_id == collection_id) &
+                        (Collections.user_id == user_id)
+                    )
+                    .order_by(func.random())
+                    .limit(1)
+                )
+            else:
+                stmt = (
+                    select(Cards)
+                    .join(Collections, Cards.collection_id == Collections.id)
+                    .where(Collections.user_id == user_id)
+                    .order_by(func.random())
+                    .limit(1)
+                )
 
             result = await session.execute(stmt)
             random_card = result.scalars().first()

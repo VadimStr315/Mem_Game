@@ -68,7 +68,7 @@ async def get_collection_cards(collection_id:int, current_user: User = Depends(g
 @collection_router.get('/{collection_id}',response_model=GetCollection)
 async def get_collection(collection_id:int, current_user: User = Depends(get_current_user)):
     try:
-        new_collection = await collectionManager.get_collection(collection_id=collection_id)
+        new_collection = await collectionManager.get_user_collection(collection_id=collection_id)
         return GetCollection.model_validate(new_collection)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -42,3 +42,6 @@ class DeleteCard(BaseModel):
     class Config:
         from_attributes = True
         orm_mode = True
+
+class RandomCard(BaseModel):
+    collection_id: Optional[int] = None

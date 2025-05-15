@@ -1,12 +1,13 @@
 from routers.cards.models import (CreateCard,
                                     GetCardOneCard,
                                     GetListOfCards,
-                                    UpdateCard)
+                                    UpdateCard,
+                                    RandomCard)
 from database.redis import redisManager
 from database.postgres import collectionManager, cardsManager, postgresManager
 from routers.users.models import User
 from routers.users.auth import get_current_user
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 
@@ -51,11 +52,12 @@ async def get_card(card_id:int, current_user: User = Depends(get_current_user)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@cards_router.get('/random_card', response_model=GetCardOneCard)
-async def get_random_card(current_user: User = Depends(get_current_user)):
+@cards_router.get('/random_card/{collection_id}', response_model=GetCardOneCard)
+async def get_random_card(collection:RandomCard, current_user: User = Depends(get_current_user)):
     try:
         user_id = current_user.id
-        card = await cardsManager.random_card(user_id=user_id)
+        collection_id = collection.collection_id
+        card = await cardsManager.random_card(user_id=user_id, collection_id=collection_id)
 
         return GetCardOneCard.model_validate(card)
     except Exception as e:
