@@ -1,6 +1,6 @@
 import logging
 
-from database.postgres.models import Base, Users, Collections, Cards
+from database.postgres.models import Base, User, Collections, Cards
 from sqlalchemy import select, func, delete
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from decouple import config
@@ -35,13 +35,13 @@ class PosgtresCore:
 
     async def check_user_exists(self, email: str) -> bool:
         async with self.Session() as session:
-            exists = await session.execute(select(Users).filter_by(email=email))
+            exists = await session.execute(select(User).filter_by(email=email))
             user_exists = exists.scalars().first() is not None
             return user_exists
 
     async def create_user(self, email: str, hashed_password: str):
         async with self.Session() as session:
-            user = Users(email=email, hashed_password=hashed_password)
+            user = User(email=email, hashed_password=hashed_password)
             session.add(user)
             try:
                 await session.commit()
@@ -52,7 +52,7 @@ class PosgtresCore:
 
     async def get_user(self, email: str):
         async with self.Session() as session:
-            result = await session.execute(select(Users).filter_by(email=email))
+            result = await session.execute(select(User).filter_by(email=email))
             user = result.scalars().first()
             return user
         
@@ -81,11 +81,12 @@ class PosgtresCore:
 
 class CollectionManager(PosgtresCore):
 
-    async def create_collection(self, collection):
+    async def create_collection(self, collection, user_id):
         async with self.Session() as session:
             new_collection = Collections(
                 name = collection.name,
-                amount_of_cards = 0   
+                amount_of_cards = 0,
+                user_id=user_id   
             )
             session.add(new_collection)
             await session.commit()
@@ -93,44 +94,59 @@ class CollectionManager(PosgtresCore):
 
             return new_collection
     
-    async def get_collection(self, collection_id:int=None):
-        if collection_id == None:
-            return []
-        
+    async def get_user_collection(
+        self, 
+        collection_id: int, 
+        user_id: int):
         async with self.Session() as session:
-            result = await session.get(Collections, collection_id)
-            # result = result.scalar_one_or_none()
-            return result
+            result = await session.execute(
+                select(Collections)
+                .where(
+                    Collections.id == collection_id,
+                    Collections.user_id == user_id
+                )
+            )
+            return result.scalar_one_or_none()
         
-    async def get_collections(self):
+    async def get_collections(self,user_id):
     
         async with self.Session() as session:
             result = await session.execute(
                 select(Collections)
+                .where(Collections.user_id == user_id)
             )
             collections = result.scalars().all()
             return collections
         
-    async def delete_collection(self, collection_id:int=None):
+    async def delete_collection(self, collection_id:int=None, user_id:int=None):
         if collection_id == None:
             return []
         
         async with self.Session() as session:
-            existing = await session.get(Collections, collection_id)
+            existing = await session.execute(
+                select(Collections)
+                .where(Collections.id == collection_id,
+                       Collections.user_id == user_id) 
+            )
             if not existing:
                 return False
                 
             # Perform the deletion
             result = await session.execute(
                 delete(Collections)
-                .where(Collections.id == collection_id)
+                .where(Collections.id == collection_id,
+                       Collections.user_id == user_id)
             )
             await session.commit()
             return True
         
-    async def update_collection(self, collection):
+    async def update_collection(self, collection, user_id):
         async with self.Session() as session:
-            existing_collection = await session.get(Collections, collection.id)
+            existing_collection  = await session.execute(
+                select(Collections)
+                .where(Collections.id == collection.id,
+                       Collections.user_id == user_id) 
+            )
             
             if existing_collection is None:
                 raise ValueError("Collection not found")

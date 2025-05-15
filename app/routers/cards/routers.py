@@ -4,7 +4,8 @@ from routers.cards.models import (CreateCard,
                                     UpdateCard)
 from database.redis import redisManager
 from database.postgres import collectionManager, cardsManager, postgresManager
-
+from routers.users.models import User
+from routers.users.auth import get_current_user
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
@@ -16,7 +17,7 @@ cards_router = APIRouter(prefix='/card',tags=['cards'])
 
 
 @cards_router.post('/create', response_model=GetCardOneCard)
-async def create_card(card:CreateCard):
+async def create_card(card:CreateCard, current_user: User = Depends(get_current_user)):
     try:
         new_card = await cardsManager.create_card(card=card)
         return GetCardOneCard.model_validate(new_card)
@@ -24,7 +25,7 @@ async def create_card(card:CreateCard):
         raise HTTPException(status_code=500, detail=str(e))
 
 @cards_router.patch('/update', response_model=UpdateCard)
-async def update_card(card:UpdateCard):
+async def update_card(card:UpdateCard, current_user: User = Depends(get_current_user)):
     try:
         updated_card = await cardsManager.update_card(card=card)
         return UpdateCard.model_validate(updated_card)
@@ -32,7 +33,7 @@ async def update_card(card:UpdateCard):
         raise HTTPException(status_code=500, detail=str(e))
 
 @cards_router.delete('/{card_id}')
-async def delete_card(card_id:int):
+async def delete_card(card_id:int, current_user: User = Depends(get_current_user)):
     try:
         del_card = await cardsManager.delete_card(card_id=card_id)
         if del_card:
@@ -43,7 +44,7 @@ async def delete_card(card_id:int):
         raise HTTPException(status_code=500, detail=str(e))
     
 @cards_router.get('/{card_id}', response_model=GetCardOneCard)
-async def get_card(card_id:int):
+async def get_card(card_id:int, current_user: User = Depends(get_current_user)):
     try:
         card = await cardsManager.get_card(card_id=card_id)
         return GetCardOneCard.model_validate(card)

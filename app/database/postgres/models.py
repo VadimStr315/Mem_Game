@@ -26,16 +26,20 @@ class Base(DeclarativeBase):
         return f"<{self.__class__.__name__} {', '.join(cols)}>"
 
 
-class Users(Base):
+class User(Base):
     __tablename__ = 'users'
 
-    id:Mapped[int] = mapped_column(Integer, primary_key=True)
-    
-    name:Mapped[str] = mapped_column(String(100), nullable=True)
-    surname: Mapped[str] = mapped_column(String(100), nullable=True)
+    id: Mapped[intpk]
 
-    email: Mapped[str] = mapped_column(String(100), unique=True)
-    hashed_password: Mapped[str] = mapped_column(String(255))
+    email: Mapped[str_256]
+    hashed_password: Mapped[str_256]
+
+    repr_cols_num = 2
+    repr_cols = ("email",)
+
+    collections: Mapped[List["Collections"]] = relationship(
+        "Collections", back_populates="user"
+    )
 
 
 class Collections(Base):
@@ -46,12 +50,17 @@ class Collections(Base):
     name:  Mapped[str] = mapped_column(String(255),unique=True)
     amount_of_cards:  Mapped[int] = mapped_column(Integer)
 
-
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    
     repr_cols_num = 2
     repr_cols = ("name", "amount_of_cards")
 
     cards: Mapped[List["Cards"]] = relationship(
     "Cards", back_populates="collection")
+
+    user: Mapped["User"] = relationship(
+        "User", back_populates="collections"
+    )
 
 
 class Cards(Base):
@@ -63,4 +72,4 @@ class Cards(Base):
     collection_id: Mapped[int] = mapped_column(
         ForeignKey('collections.id', ondelete='CASCADE'))
     collection: Mapped[Collections] = relationship(
-        'Collections', back_populates='cards')
+        'Collections', back_populates='cards') 

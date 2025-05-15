@@ -1,4 +1,4 @@
-from database.postgres.models import Users
+from database.postgres.models import User
 from database.postgres import postgresManager
 
 from datetime import datetime, timedelta
