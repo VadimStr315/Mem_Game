@@ -400,6 +400,8 @@ class CardsManager(CollectionManager):
 
             result = await session.execute(stmt)
             random_card = result.scalars().first()
+            if random_card:
+                random_card.collection_ids = [collection_card.collection_id for collection_card in result.collection_cards]
 
             return random_card
 
