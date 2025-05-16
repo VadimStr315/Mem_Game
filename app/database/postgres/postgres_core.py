@@ -129,8 +129,11 @@ class CollectionManager(PosgtresCore):
             session.add(new_collection)
             await session.commit()
             await session.refresh(new_collection)  # Refresh to get the new ID and other defaults
-
-            return new_collection
+            if new_collection:
+                new_collection.amount_of_cards = 0
+                return new_collection
+            else:
+                return {}
     
     async def get_user_collection(
         self, 
