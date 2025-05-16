@@ -21,7 +21,6 @@ cards_router = APIRouter(prefix='/card', tags=['cards'])
 async def create_card(card: CreateCard, current_user: User = Depends(get_current_user)):
     try:
         new_card = await cardsManager.create_card(card=card)
-        # new_card.collection_ids = [card.collection_id]
         return GetCardOneCard.model_validate(new_card)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

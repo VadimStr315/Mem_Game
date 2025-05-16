@@ -296,15 +296,26 @@ class CardsManager(CollectionManager):
 
             await session.commit()
             await session.refresh(new_card)
+            new_card.collection_ids = card.collection_ids
             return new_card
 
     async def get_card(self, card_id: int):
         async with self.Session() as session:
-            result = await session.get(Cards, card_id)
-            if result:
-                result.collection_ids = [collection_card.collection_id for collection_card in result.collection_cards]
+            # Fetch the card along with its collection cards
+            result = await session.execute(
+                select(Cards)
+                .options(selectinload(Cards.collection_cards))
+                .where(Cards.id == card_id)
+            )
+            
+            card = result.scalars().first()
 
-            return result
+            if card:
+                # Extract collection_ids from the loaded collection_cards
+                card.collection_ids = [collection_card.collection_id for collection_card in card.collection_cards]
+
+            return card
+
 
     async def update_card(self, card):
         async with self.Session() as session:
@@ -382,28 +393,35 @@ class CardsManager(CollectionManager):
             if collection_id is None:
                 stmt = (
                     select(Cards)
-                    .filter(
-                        Cards.collection_cards.any(
-                            CollectionCards.collection_id == Collections.id),
-                        (Collections.user_id == user_id)
-                    )
+                    .options(selectinload(Cards.collection_cards))  # Eager load collection_cards
+                    .join(CollectionCards)
+                    .join(Collections)
+                    .filter(Collections.user_id == user_id)
                     .order_by(func.random())
                     .limit(1)
                 )
             else:
                 stmt = (
                     select(Cards)
-                    .where(Collections.user_id == user_id)
+                    .options(selectinload(Cards.collection_cards))  # Eager load collection_cards
+                    .join(CollectionCards)
+                    .filter(CollectionCards.collection_id == collection_id)
+                    .join(Collections)
+                    .filter(Collections.user_id == user_id)
                     .order_by(func.random())
                     .limit(1)
                 )
 
             result = await session.execute(stmt)
             random_card = result.scalars().first()
+
             if random_card:
-                random_card.collection_ids = [collection_card.collection_id for collection_card in result.collection_cards]
+                # Extract collection_ids from the loaded collection_cards
+                random_card.collection_ids = [collection_card.collection_id for collection_card in random_card.collection_cards]
 
             return random_card
+
+
 
     async def get_all_cards(self, user_id: int = None):
         if user_id is None:
