@@ -67,7 +67,7 @@ class Cards(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    text:  Mapped[str] = mapped_column(String, unique=True)
+    text:  Mapped[str] = mapped_column(String)
     collection_id: Mapped[int] = mapped_column(
         ForeignKey('collections.id', ondelete='CASCADE'))
     collection: Mapped[Collections] = relationship(
