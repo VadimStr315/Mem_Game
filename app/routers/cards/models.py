@@ -25,6 +25,8 @@ class GetListOfCards(BaseModel):
 class GetCardOneCard(BaseModel):
     id: int
     text: str
+    collection_ids: list[int]
+
 
     class Config:
         from_attributes = True
