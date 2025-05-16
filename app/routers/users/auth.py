@@ -20,14 +20,20 @@ REFRESH_TOKEN_EXPIRE_DAYS = config('REFRESH_TOKEN_EXPIRE_DAYS', default=30)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Функция для хеширования пароля
+
+
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 # Функция для проверки пароля
+
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 # Функция для создания JWT токена
+
+
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
     if expires_delta:
@@ -39,6 +45,8 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     return encoded_jwt
 
 # Функция для создания refresh токена
+
+
 def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
     if expires_delta:
@@ -49,8 +57,9 @@ def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None) 
     encoded_jwt = jwt.encode(to_encode, SECRET_AUTH_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+
 # Функция для получения текущего пользователя
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token")
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):

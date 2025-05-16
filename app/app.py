@@ -23,12 +23,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.on_event("startup")
 async def startup_event():
-    await postgresManager.init_db()    
+    await postgresManager.init_db()
     await redisManager.connect()
-# Подключение маршрутов
 
+# Подключение маршрутов
 app.include_router(cards_router)
 app.include_router(collection_router)
 app.include_router(users_router)

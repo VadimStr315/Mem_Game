@@ -2,46 +2,52 @@ from datetime import datetime, date
 from pydantic import BaseModel, UUID4
 from typing import Union, Optional
 
+
 class CreateCard(BaseModel):
-    collection_id: int
-    text:str
+    collection_ids: list[int]
+    text: str
 
     class Config:
         from_attributes = True
         orm_mode = True
+
 
 class GetListOfCards(BaseModel):
-    id:int
-    collection_id:int
-    text:str
+    id: int
+    collection_ids: list[int]
+    text: str
 
     class Config:
         from_attributes = True
-        orm_mode = True    
+        orm_mode = True
+
 
 class GetCardOneCard(BaseModel):
-    id:int
-    text:str
+    id: int
+    text: str
 
     class Config:
         from_attributes = True
         orm_mode = True
+
 
 class UpdateCard(BaseModel):
-    id:int
-    collection_id: Optional[int] = None
-    text:Optional[str] = None
+    id: int
+    collection_ids: Optional[list[int]] = None
+    text: Optional[str] = None
 
     class Config:
         from_attributes = True
         orm_mode = True
+
 
 class DeleteCard(BaseModel):
-    id:int
+    id: int
 
     class Config:
         from_attributes = True
         orm_mode = True
+
 
 class RandomCard(BaseModel):
     collection_id: Optional[int] = None
