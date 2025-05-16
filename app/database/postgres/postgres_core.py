@@ -151,7 +151,30 @@ class CollectionManager(PosgtresCore):
         
     async def get_collections_with_cards(self, user_id: int, limit_cards: int = 5):
         async with self.Session() as session:
-            # Создаем подзапрос для карточек с нумерацией внутри коллекции
+            # Сначала получаем все коллекции пользователя
+            collections_stmt = select(Collections).where(Collections.user_id == user_id)
+            collections_result = await session.execute(collections_stmt)
+            user_collections = collections_result.scalars().all()
+            
+            if not user_collections:
+                return []
+                
+            # Создаем базовую структуру для всех коллекций с пустыми картами
+            collections_map = {}
+            for collection in user_collections:
+                # Получаем количество карт в коллекции
+                count_stmt = select(func.count()).select_from(Cards).where(Cards.collection_id == collection.id)
+                count_result = await session.execute(count_stmt)
+                amount_of_cards = count_result.scalar_one()
+                
+                collections_map[collection.id] = {
+                    "id": collection.id,
+                    "name": collection.name,
+                    "amount_of_cards": amount_of_cards,
+                    "cards": []
+                }
+            
+            # Теперь получаем карты с ограничением по количеству для каждой коллекции
             numbered_cards = (
                 select(
                     Cards,
@@ -163,7 +186,6 @@ class CollectionManager(PosgtresCore):
                 .subquery()
             )
 
-            # Основной запрос с фильтрацией по номеру строки
             stmt = (
                 select(Collections, Cards)
                 .join(numbered_cards, Collections.id == numbered_cards.c.collection_id)
@@ -176,18 +198,10 @@ class CollectionManager(PosgtresCore):
 
             result = await session.execute(stmt)
             
-            # Группируем результаты по коллекциям
-            collections_map = {}
+            # Добавляем карты в соответствующие коллекции
             for collection, card in result:
-                if collection.id not in collections_map:
-                    amount_of_cards = await self.count_amount(collection.id)
-                    collections_map[collection.id] = {
-                        "id": collection.id,
-                        "name": collection.name,
-                        "amount_of_cards": amount_of_cards,
-                        "cards": []
-                    }
-                collections_map[collection.id]["cards"].append(card)
+                if collection.id in collections_map:
+                    collections_map[collection.id]["cards"].append(card)
             
             return list(collections_map.values())
         

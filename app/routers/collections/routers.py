@@ -50,9 +50,11 @@ async def delete_collection(collection_id:int, current_user: User = Depends(get_
         raise HTTPException(status_code=500, detail=str(e))
     
 @collection_router.get('/all', response_model=List[CollectionWithCardsResponse])
-async def get_all_collections_with_cards(current_user: User = Depends(get_current_user)):
+async def get_all_collections_with_cards():
+    # current_user: User = Depends(get_current_user)
     try:
-        user_id = current_user.id
+        # user_id = current_user.id
+        user_id = 1
         collections = await collectionManager.get_collections_with_cards(user_id=user_id)
         return collections
     except Exception as e:
