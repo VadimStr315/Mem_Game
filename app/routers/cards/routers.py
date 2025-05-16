@@ -64,7 +64,7 @@ async def get_random_card(collection:RandomCard, current_user: User = Depends(ge
         raise HTTPException(status_code=500, detail=str(e))
 
 @cards_router.get('/all/', response_model=GetCardOneCard)
-async def get_random_card(current_user: User = Depends(get_current_user)):
+async def get_all_cards(current_user: User = Depends(get_current_user)):
     try:
         user_id = current_user.id
         card = await cardsManager.get_all_cards(user_id=user_id)
