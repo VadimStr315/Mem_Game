@@ -25,7 +25,7 @@ class GetListOfCards(BaseModel):
 class GetCardOneCard(BaseModel):
     id: int
     text: str
-    # collection_ids: list[int]
+    collection_ids: list[int]
 
 
     class Config:

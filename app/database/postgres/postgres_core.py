@@ -301,6 +301,9 @@ class CardsManager(CollectionManager):
     async def get_card(self, card_id: int):
         async with self.Session() as session:
             result = await session.get(Cards, card_id)
+            if result:
+                result.collection_ids = [collection_card.collection_id for collection_card in result.collection_cards]
+
             return result
 
     async def update_card(self, card):
