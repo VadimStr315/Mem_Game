@@ -258,11 +258,11 @@ class CollectionManager(PosgtresCore):
 
     async def update_collection(self, collection, user_id):
         async with self.Session() as session:
-            existing_collection = await session.execute(
+            existing_collection = (await session.execute(
                 select(Collections)
                 .where(Collections.id == collection.id,
                        Collections.user_id == user_id)
-            )
+            )).scalars().first()
 
             if existing_collection is None:
                 raise ValueError("Collection not found")
@@ -313,11 +313,26 @@ class CardsManager(CollectionManager):
             if card.text is not None:
                 exisiting_card.text = card.text
 
-            if card.collection_id is not None:
-                exisiting_card.collection_id = card.collection_id
+            if card.collection_ids is not None:
+                query = select(CollectionCards).where(
+                    CollectionCards.card_id == card.id
+                )
+
+                col_cards = (await session.execute(query)).scalars().all()
+
+                for col_card in col_cards:
+                    await session.delete(col_card)
+
+                for id_collection in card.collection_ids:
+                    new_collection_card = CollectionCards(
+                        collection_id=int(id_collection),
+                        card_id=card.id
+                    )
+                    session.add(new_collection_card)
 
             await session.commit()
             await session.refresh(exisiting_card)
+            exisiting_card.collection_ids = card.collection_ids
             return exisiting_card
 
     async def delete_card(self, card_id):
@@ -345,9 +360,15 @@ class CardsManager(CollectionManager):
             result = await session.execute(
                 select(Cards).where(Cards.collection_cards.any(
                     CollectionCards.collection_id == collection_id
-                ))
+                )).options(
+                    selectinload(Cards.collection_cards)
+                )
             )
-            result = result.all()
+            result = result.scalars().all()
+
+            for r in result:
+                r.collection_ids = [
+                    c.collection_id for c in r.collection_cards]
             return result
 
     async def random_card(self, user_id: int = None, collection_id=None):

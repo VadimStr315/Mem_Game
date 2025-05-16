@@ -57,10 +57,9 @@ async def get_card(card_id: int, current_user: User = Depends(get_current_user))
 
 
 @cards_router.get('/random_card/{collection_id}', response_model=GetCardOneCard)
-async def get_random_card(collection: RandomCard, current_user: User = Depends(get_current_user)):
+async def get_random_card(collection_id: int, current_user: User = Depends(get_current_user)):
     try:
         user_id = current_user.id
-        collection_id = collection.collection_id
         card = await cardsManager.random_card(user_id=user_id, collection_id=collection_id)
 
         return GetCardOneCard.model_validate(card)

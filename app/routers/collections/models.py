@@ -4,7 +4,7 @@ from typing import Union, Optional, List
 
 
 class CreateCollection(BaseModel):
-    name:str
+    name: str
 
 
 class CardResponse(BaseModel):
@@ -13,6 +13,7 @@ class CardResponse(BaseModel):
 
     class Config:
         from_attributes = True  # Ранее orm_mode=True в Pydantic v1
+
 
 class CollectionWithCardsResponse(BaseModel):
     id: int
@@ -23,9 +24,10 @@ class CollectionWithCardsResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class GetCollection(BaseModel):
     id: int
-    name:str
+    name: str
     amount_of_cards: int
 
     class Config:
@@ -35,7 +37,7 @@ class GetCollection(BaseModel):
 
 class UpdateCollection(BaseModel):
     id: int
-    name:Optional[str] = None
+    name: Optional[str] = None
     amount_of_cards: Optional[int] = None
 
     class Config:
@@ -44,7 +46,7 @@ class UpdateCollection(BaseModel):
 
 
 class DeleteCollection(BaseModel):
-    id:int
+    id: int
 
     class Config:
         from_attributes = True
@@ -52,9 +54,9 @@ class DeleteCollection(BaseModel):
 
 
 class GetListOfCards(BaseModel):
-    id:int
-    collection_id:int
-    text:str
+    id: int
+    collection_ids: list[int]
+    text: str
 
     class Config:
         from_attributes = True
