@@ -54,6 +54,12 @@ services:
       - "8081:80"
     networks:
       - core_network
+  ui:
+    build:
+      context: ./ui
+      target: production
+    ports:
+      - "8080:8080"
 
 networks:
   core_network:
