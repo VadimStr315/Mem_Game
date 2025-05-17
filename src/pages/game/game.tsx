@@ -61,6 +61,7 @@ export default function Game() {
     if (!activeCard) return
     await axios.delete(PagesURl.CARD + `/${activeCard.id}`)
     handleGetCard()
+    setCardIdToDelete(undefined)
   }
 
   const addToCollection = () => {

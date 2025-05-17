@@ -91,6 +91,7 @@ export default function Cards () {
   const handleDeleteCollection = async (collectionId: number) => {
     await axios.delete(PagesURl.COLLECTION + `/${collectionId}`)
     handleGetAllCollections()
+    setCollectionIdToDelete(undefined)
   }
   const handleEditCollection = async (collection: CollectionWithCards) => {
     try {
