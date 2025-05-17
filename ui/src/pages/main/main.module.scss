@@ -141,8 +141,14 @@
     }
   }
   &__content {
+    display: flex;
+    flex-direction: column;
+    row-gap: 64px;
     max-width: 1062px;
     margin-right: 20px;
+    @media screen and (max-width: $desktop) {
+      row-gap: 32px;
+    }
   }
   &__textBy {
     font-weight: 500;
@@ -174,7 +180,10 @@
     line-height: 100%;
     letter-spacing: 0.01em;
     max-width: 1011px;
-    margin-bottom: 85px;
+    margin-bottom: 21px;
+    @media screen and (max-width: $desktop) {
+      margin-bottom: 16px;
+    }
   }
   &__buttonContainer {
     display: flex;
