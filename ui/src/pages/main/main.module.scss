@@ -1,0 +1,213 @@
+.page {
+  padding-top: 60px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-x: hidden;
+}
+
+.header {
+  padding-left: 62px;
+  padding-right: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 75px;
+  @media screen and (max-width: $desktop) {
+    padding-right: 30px;
+    padding-left: 30px;
+  }
+  &__links {
+    display: flex;
+    align-items: center;
+    column-gap: 64px;
+    @media screen and (max-width: $desktop) {
+      display: none;
+      padding-right: 30px;
+      padding-left: 30px;
+    }
+  }
+  &__link {
+    text-decoration: none;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    text-transform: uppercase;
+    color: inherit;
+  }
+  &__button {
+    width: 233px;
+    height: 48px;
+    background-image: url(../../../public/button/button_small.svg);
+    background-position: 0;
+    background-size: 233px 48px;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 100%;
+    text-transform: uppercase;
+    color: #fff;
+    overflow: visible;
+    background-color: #fff;
+  }
+  &__burger {
+    display: block;
+    width: 50px;
+    height: 31px;
+    cursor: pointer;
+    background-image: url(../../../public/icons/burger.svg);
+    @media screen and (min-width: $desktop) {
+      display: none;
+    }
+  }
+  .menu {
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    background: #29292933;
+    display: flex;
+    justify-content: flex-end;
+    z-index: 2;
+    &__content {
+      width: 340px;
+      background-color: #fff;
+      box-shadow: 0px 4px 15px 10px #0000000D;
+      border-top-left-radius: 32px;
+      border-bottom-left-radius: 32px;
+      padding-top: 32px;
+      padding-left: 28px;
+      padding-right: 20px;
+    }
+    &__first {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 64px;
+    }
+    &__title {
+      font-weight: 500;
+      font-size: 32px;
+      line-height: 100%;
+      letter-spacing: 0%;
+      text-align: center;
+      color: #000;
+    }
+    &__links {
+      display: flex;
+      flex-direction: column;
+      row-gap: 32px;
+    }
+    &__textBy {
+      position: absolute;
+      bottom: 32px;
+      font-weight: 500;
+      font-size: 24px;
+      line-height: 100%;
+      letter-spacing: 1%;
+      text-align: left;
+      text-transform: uppercase;
+      color: #D84B39;
+    }
+  }
+}
+
+.main {
+  position: relative;
+  overflow: visible;
+  padding-left: 60px;
+  flex: 1;
+  width: 100%;
+  &__background {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    @media screen and (max-width: $desktop) {
+      display: none;
+    }
+    &_m {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+  }
+  &__content {
+    max-width: 1062px;
+    margin-right: 20px;
+  }
+  &__textBy {
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 100%;
+    letter-spacing: 1%;
+    text-align: left;
+    text-transform: uppercase;
+    color: #D84B39;
+  }
+  &__title {
+    font-weight: 300;
+    font-size: 113px;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-left: -11px;
+    @media screen and (max-width: $desktop) {
+      font-size: 60px;
+      margin-left: -5px;
+      margin-top: 32px;
+      margin-bottom: 32px;
+    }
+  }
+  &__text {
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 100%;
+    letter-spacing: 0.01em;
+    max-width: 1011px;
+    margin-bottom: 85px;
+  }
+  &__buttonContainer {
+    display: flex;
+    justify-content: flex-end;
+  }
+  &__button {
+    width: 622px;
+    height: 128px;
+    background: none;
+    background-image: url(../../../public/button/button_big.svg);
+    background-position: 0;
+    background-size: 622px 128px;
+    font-weight: 400;
+    font-size: 48px;
+    line-height: 100%;
+    text-transform: uppercase;
+    color: #fff;
+    overflow: visible;
+    background-color: #fff;
+    background-color: transparent;
+    @media screen and (max-width: $desktop) {
+      background-image: url(../../../public/button/button_small.svg);
+      font-size: 24px;
+      width: 311px;
+      height: 64px;
+      background-size: 311px 64px;
+    }
+  }
+  &__repeatingText {
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 100%;
+    text-transform: uppercase;
+    color: #fff;
+  }
+}

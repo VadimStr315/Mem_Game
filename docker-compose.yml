@@ -1,0 +1,66 @@
+  
+services: 
+  postgres:
+    image: postgres:15.1
+    container_name: core-postgres
+    restart: unless-stopped
+    env_file:
+    - .env
+    volumes: 
+    - ./data:/var/lib/postgresql/data
+    networks:
+      - core_network
+    ports:
+      - "5433:5432"
+      
+  redis:
+    image: redis:latest 
+    container_name: core-redis
+    restart: unless-stopped
+    volumes:
+      - ./data:/var/lib/redis_data/data
+    networks:
+      - core_network
+    ports:
+      - "6379:6379"
+
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - core_network
+    command: ["sh", "-c", "sleep 10 && uvicorn app:app --host 0.0.0.0 --port 8000 --reload"]
+
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8081:80"
+    networks:
+      - core_network
+  ui:
+    build:
+      context: ./ui
+      target: production
+    ports:
+      - "8080:8080"
+
+networks:
+  core_network:
+    driver: bridge

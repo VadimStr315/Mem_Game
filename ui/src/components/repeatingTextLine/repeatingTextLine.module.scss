@@ -1,0 +1,7 @@
+.text {
+  margin-right: 128px;
+  @media screen and (max-width: $tablet) {
+    margin-right: 32px;
+    font-size: 18px;
+  }
+}
