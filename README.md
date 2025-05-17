@@ -1,4 +1,4 @@
-# Foreigners_tracker_URFU_UI
+# MEME_GAME
 
 ## Переменные окружения
 
