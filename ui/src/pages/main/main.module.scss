@@ -35,6 +35,12 @@
     letter-spacing: 0%;
     text-transform: uppercase;
     color: inherit;
+    &:focus {
+      font-weight: 600;
+    }
+    &:nth-child(2){
+      width: 215px;
+    }
   }
   &__button {
     width: 233px;
@@ -49,6 +55,9 @@
     color: #fff;
     overflow: visible;
     background-color: #fff;
+    &:focus {
+      background-image: url(../../../public/button/button_small_active.svg);
+    }
   }
   &__burger {
     display: block;
@@ -141,14 +150,8 @@
     }
   }
   &__content {
-    display: flex;
-    flex-direction: column;
-    row-gap: 64px;
     max-width: 1062px;
     margin-right: 20px;
-    @media screen and (max-width: $desktop) {
-      row-gap: 32px;
-    }
   }
   &__textBy {
     font-weight: 500;
@@ -180,10 +183,7 @@
     line-height: 100%;
     letter-spacing: 0.01em;
     max-width: 1011px;
-    margin-bottom: 21px;
-    @media screen and (max-width: $desktop) {
-      margin-bottom: 16px;
-    }
+    margin-bottom: 85px;
   }
   &__buttonContainer {
     display: flex;
@@ -204,12 +204,18 @@
     overflow: visible;
     background-color: #fff;
     background-color: transparent;
+    &:focus {
+      background-image: url(../../../public/button/button_big_active.svg);
+    }
     @media screen and (max-width: $desktop) {
       background-image: url(../../../public/button/button_small.svg);
       font-size: 24px;
       width: 311px;
       height: 64px;
       background-size: 311px 64px;
+          &:focus {
+      background-image: url(../../../public/button/button_small_active.svg);
+    }
     }
   }
   &__repeatingText {

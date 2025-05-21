@@ -35,6 +35,9 @@
     letter-spacing: 0%;
     text-transform: uppercase;
     color: inherit;
+    &:focus {
+      font-weight: 600;
+    }
   }
   &__button {
     width: 233px;
@@ -146,6 +149,23 @@
     border-radius: 32px;
     background-color: #fff;
     padding: 32px;
+    &_active {
+      position: relative;
+      border-width: 3px;
+      border-style: solid;
+      border-radius: 32px;
+      &::before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+        background: linear-gradient(169.1deg, #D44239 2.3%, #F07F3B 93.32%);
+        border-radius: 35px;
+        z-index: -1;
+      }
+    }
     &__title {
       font-weight: 600;
       font-size: 32px;
