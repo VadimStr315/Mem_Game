@@ -149,7 +149,7 @@ export default function Cards () {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <img src='/logo.svg' />
+        <img src='/logo.svg' onClick={()=>navigate('/')}/>
         <div className={styles.header__links}>
           <Link className={styles.header__link} to={'/cards'}>мои подборки</Link>
           <Link className={styles.header__link} to={''}>О нас</Link>
