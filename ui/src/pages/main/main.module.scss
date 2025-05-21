@@ -35,6 +35,12 @@
     letter-spacing: 0%;
     text-transform: uppercase;
     color: inherit;
+    &:focus {
+      font-weight: 600;
+    }
+    &:nth-child(2){
+      width: 215px;
+    }
   }
   &__button {
     width: 233px;
@@ -49,6 +55,9 @@
     color: #fff;
     overflow: visible;
     background-color: #fff;
+    &:focus {
+      background-image: url(../../../public/button/button_small_active.svg);
+    }
   }
   &__burger {
     display: block;
@@ -195,12 +204,18 @@
     overflow: visible;
     background-color: #fff;
     background-color: transparent;
+    &:focus {
+      background-image: url(../../../public/button/button_big_active.svg);
+    }
     @media screen and (max-width: $desktop) {
       background-image: url(../../../public/button/button_small.svg);
       font-size: 24px;
       width: 311px;
       height: 64px;
       background-size: 311px 64px;
+          &:focus {
+      background-image: url(../../../public/button/button_small_active.svg);
+    }
     }
   }
   &__repeatingText {
