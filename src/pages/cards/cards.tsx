@@ -19,6 +19,7 @@ export default function Cards () {
   const [isOpenedMenu, setIsOpenedMenu] = useState(false)
 
   const [activeCollection, setActiveCollection] = useState<CollectionWithCards>()
+  const [activeSlideIndex, setActiveSlideIndex] = useState<number>()
 
   const [displayCollectionPopup, setDisplayCollectionPopup] = useState<string>()
   const [collectionIdToDelete, setCollectionIdToDelete] = useState<number>()
@@ -178,6 +179,8 @@ export default function Cards () {
             className={styles.main__swiper}
             style={{padding:'20px'}}
             spaceBetween={'40px'}
+            onSwiper={() => setActiveSlideIndex(swiper.current?.swiper.activeIndex || 0)}
+            onSlideChange={() => setActiveSlideIndex(swiper.current?.swiper.activeIndex || 0)}
             breakpoints={{
               1024: {
                 direction: 'horizontal',
@@ -192,8 +195,8 @@ export default function Cards () {
               }
             }}
           >
-            {allCollections.map((collection)=>(
-              <SwiperSlide key={collection.id} className={styles.main__swiper__slide}>
+            {allCollections.map((collection, index)=>(
+              <SwiperSlide key={collection.id} className={`${styles.main__swiper__slide} ${activeSlideIndex === index && styles.main__slide_active}`}>
                 <div className={styles.main__slide}>
                 {activeCollection?.id === collection.id ? <input onBlur={()=>handleEditCollection(activeCollection)} onChange={(e) => setActiveCollection({...collection, name: e.target.value})} className={styles.main__slide__input} autoFocus value={activeCollection.name}/> :
                   <p onClick={() => collection.name !== 'Все карточки' && setActiveCollection(collection)} className={styles.main__slide__title}>{collection.name}</p>}

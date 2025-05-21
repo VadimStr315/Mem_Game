@@ -1,6 +1,7 @@
 .page {
   position: relative;
   height: 100vh;
+  overflow: hidden;
   padding-top: 60px;
   background: linear-gradient(166.15deg, #FFA13D 9.85%, #D44239 96.13%);
   @media screen and (max-width: $desktop) {
