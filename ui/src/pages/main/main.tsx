@@ -41,7 +41,7 @@ function Main() {
           <p className={styles.main__textBy}>created by irit-rtf</p>
           <h1 className={styles.main__title}>Какой ты мем?</h1>
           <p className={styles.main__text}>
-            Игра от проектного практикума ИРИТ-РТФ. Добавляй свои карточки-ситуации из студенческой жизнь, создавай уникальные подборки, чтобы покачать игру на максимум!
+            Игра от проектного практикума ИРИТ-РТФ. Добавляй свои карточки-ситуации из студенческой жизни, создавай уникальные подборки, чтобы прокачать игру на максимум!
           </p>
           <div className={styles.main__buttonContainer}>
             <button onClick={() => navigate('/game')} className={styles.main__button}>начать игру</button>
